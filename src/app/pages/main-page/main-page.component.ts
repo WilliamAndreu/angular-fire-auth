@@ -1,8 +1,8 @@
 import { Component, OnInit } from "@angular/core";
-import * as AOS from "aos";
-import {AuthService} from "../../services/auth.service";
-import {MatDialog, MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {UserInfoDialogComponent} from "../../components/user-info-dialog/user-info-dialog.component";
+import { AuthService } from "../../services/auth.service";
+import { MatDialog } from '@angular/material/dialog';
+import { UserInfoDialogComponent } from "../../components/user-info-dialog/user-info-dialog.component";
+import {lastValueFrom} from "rxjs";
 
 @Component({
   selector: "app-main-page",
@@ -10,37 +10,57 @@ import {UserInfoDialogComponent} from "../../components/user-info-dialog/user-in
   styleUrls: ["./main-page.component.scss"],
 })
 export class MainPageComponent implements OnInit {
-  public loading = false
+  /**
+   * Indicates whether the component is currently loading.
+   *
+   * @type {boolean}
+   * @memberof MainPageComponent
+   */
+  public loading = false;
+
   constructor(public authService: AuthService, public dialog: MatDialog) {}
 
-  ngOnInit(): void {
 
-  }
+  ngOnInit(): void {}
 
-  login() {
+  /**
+   * Authenticates the user using Google authentication.
+   * Displays user information in a dialog if authentication is successful.
+   *
+   * @memberof MainPageComponent
+   */
+  async login() {
     this.loading = true;
-    this.authService.GoogleAuth().then( () => {
-      setTimeout(() => {
-        this.loading = false;
+    const value = await lastValueFrom( this.authService.GoogleAuth());
+    if (value){
+      this.loading = false;
+      setTimeout(()=>{
         this.openDialog();
-      }, 800);
+      }, 800)
+    }
 
-    });
   }
 
-  loginEmail() {
+  /**
+   * Authenticates the user using email and password.
+   * Logs the authentication result to the console.
+   *
+   * @memberof MainPageComponent
+   */
+  async loginEmail() {
     this.loading = true;
-    this.authService.emailLogin('willy@rudo.es', 'Rudo123').then((result) => {
-      console.log(result);
-    })
+    const result = await lastValueFrom(this.authService.emailLogin('willy@rudo.es', 'Rudo123'));
+    console.log(result);
   }
 
+  /**
+   * Opens a dialog to display user information.
+   *
+   * @memberof MainPageComponent
+   */
   openDialog(): void {
     const dialogRef = this.dialog.open(UserInfoDialogComponent, { panelClass: 'bg-color'});
 
-    dialogRef.afterClosed().subscribe(result => {
-
-    });
+    dialogRef.afterClosed().subscribe(result => {});
   }
-
 }
