@@ -1,0 +1,10 @@
+{
+    "helloworld":"Hola Mundo",
+
+    "header":{
+        "dateText":"de"
+    },
+    "footer":{
+        "copyright":"© 2023 Rudo Office"
+    }
+}
